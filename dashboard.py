@@ -390,7 +390,7 @@ def main():
         st.write("The GDPR (Article 22) provides restrictive rules"
                  " to prevent man from being subjected to decisions"
                  " emanating only from machines.")
-        st.write("SHAP meets the requirements of the GDPR and allows"
+        st.write("SHAP meets the requirements of the GDPR and allows us"
                  " to determine the effects of the features"
                  " in the result of predicting the customer's N°{} score. "
                  "The feature importance changes following to"
