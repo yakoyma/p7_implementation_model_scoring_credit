@@ -372,7 +372,7 @@ def main():
         fig9 = plt.figure(figsize=(10, 20))
         sns.barplot(x='importance', y='feature', data=dataviz)
         st.write("The GDPR (Article 22) provides restrictive rules"
-                 " to prevent man from being subjected to decisions"
+                 " to prevent human from being subjected to decisions"
                  " emanating only from machines.")
         st.write("The global interpretability provides a general understanding"
                  " of the important features for the model. ")
