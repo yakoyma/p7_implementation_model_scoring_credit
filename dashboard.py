@@ -188,7 +188,7 @@ def main():
     # Heroku API URI
     API_URI = 'https://api-outil-scoring-credit.herokuapp.com/predict'
     score, situation, status = request_prediction(API_URI, X)
-    st.header("Credit application status")
+    st.header("Status of the credit application")
     st.write("The credit score varies between 0 and 100. "
              "Customers with scores above 36 are at risk.")
     st.write("**The score of the customer N°{} is {}.** "
@@ -219,7 +219,7 @@ def main():
     shap_features = list(shap_df.iloc[0:20, ].feature)
 
     # Customer description
-    st.header("Customer descriptive information")
+    st.header("Descriptive information of the customer")
     info_viz = customer_description(customer_df)
     st.dataframe(info_viz.set_index('Customer ID'))
 
@@ -232,7 +232,7 @@ def main():
          "Local interpretability of the model",
          "customer's data"])
 
-    # Selection of features for descriptive information
+    # Selection of features for the descriptive information
     features = ['CNT_CHILDREN', 'DAYS_BIRTH', 'DAYS_EMPLOYED',
                 'AMT_INCOME_TOTAL', 'AMT_CREDIT', 'AMT_ANNUITY']
     for feature in shap_features:
@@ -247,7 +247,7 @@ def main():
     infos_viz = info_viz.append(group_viz)
 
     if info_display == "Visualisations":
-        st.header("Visualisations of descriptive information")
+        st.header("Visualisations of the descriptive information")
         st.write("Visualisations are used to compare"
                  " the descriptive information of the customer N°{}"
                  " with 10 similar clients.".format(customer_id))
@@ -344,8 +344,8 @@ def main():
         st.header("Similar customers")
         st.write("Grouping allows us to compare the customer N°{}"
                  " with 10 similar customers.".format(customer_id))
-        st.write("This grouping is based on descriptive information"
-                 " and important data for the score prediction"
+        st.write("This grouping is based on the descriptive information"
+                 " and the important data for the prediction of score"
                  " (see local model interpretability).")
         st.dataframe(group_viz.set_index('Customer ID'))
 
@@ -397,9 +397,9 @@ def main():
                  " each customer's data.".format(customer_id))
         st.pyplot(fig10)
     elif info_display == "Customer's data":
-        st.header("Important customer data")
-        st.write("Displaying important customer data for"
-                 " the score prediction.")
+        st.header("Important data of the customer")
+        st.write("Displaying the important data of the customer for"
+                 " the prediction of score.")
         viz_df = viz_df.astype('str')
         viz_df['Data'] = 'Data'
         viz_df.set_index('Data', inplace=True)
@@ -407,8 +407,8 @@ def main():
         st.dataframe(viz_df)
 
         # Loading the dataset description
-        st.subheader("Data description")
-        st.write("Displaying the description of the customer dataset.")
+        st.subheader("Description of the data")
+        st.write("Displaying the description of the customer's data.")
         data_description = load_data('data/data_columns_description.csv')
         st.dataframe(data_description.set_index('Row'))
 
