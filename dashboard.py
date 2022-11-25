@@ -1,4 +1,4 @@
-# Project 7: Implementing a scoring model
+# Project 7: Implement a scoring model
 # Import libraries
 import os
 import numpy as np
@@ -8,7 +8,7 @@ import pandas as pd
 import requests
 import time
 
-# Serialization library
+# Serialisation library
 import pickle
 
 # Front end library
@@ -17,7 +17,7 @@ import streamlit as st
 # SHAP library
 import shap
 
-# Visualization library
+# Visualisation library
 import plotly_express as px
 
 
@@ -59,10 +59,10 @@ def preprocessing(data, num_imputer, bin_imputer, transformer, scaler):
     X_bin = pd.DataFrame(bin_imputer.transform(df[binary_features]),
                          columns=binary_features)
 
-    # Normalization
+    # Normalisation
     X_norm = pd.DataFrame(transformer.transform(X_num), columns=num_features)
 
-    # Standardization
+    # Standardisation
     norm_df = pd.DataFrame(scaler.transform(X_norm), columns=num_features)
 
     for feature in binary_features:
@@ -94,7 +94,7 @@ def request_prediction(model_uri, data):
 
 
 def load_model(file, key):
-    """This function is used to load a serialized file."""
+    """This function is used to load a serialised file."""
     path = open(file, 'rb')
     model_pickle = pickle.load(path)
     model = model_pickle[key]
@@ -120,7 +120,7 @@ def apply_knn(X, X_norm, data, features):
 
 
 def customer_description(data):
-    """This function creates a dataframe with customer descriptions."""
+    """This function creates a dataframe with the customer's descriptions."""
     df = pd.DataFrame(
         columns=['Gender', 'Age (years)', 'Family status',
                  'Number of children', 'Days employed',
@@ -226,7 +226,7 @@ def main():
     # Customer information
     info_display = st.sidebar.selectbox(
         "Select the topic to display:",
-        ["Visualizations",
+        ["Visualisations",
          "Similar customers",
          "Global interpretability of the model",
          "Local interpretability of the model",
@@ -246,9 +246,9 @@ def main():
     group_viz = customer_description(group_df)
     infos_viz = info_viz.append(group_viz)
 
-    if info_display == "Visualizations":
-        st.header("Visualizations of descriptive information")
-        st.write("Visualizations are used to compare"
+    if info_display == "Visualisations":
+        st.header("Visualisations of descriptive information")
+        st.write("Visualisations are used to compare"
                  " the descriptive information of the customer N°{}"
                  " with 10 similar clients.".format(customer_id))
         display_description = st.sidebar.selectbox(
@@ -388,7 +388,7 @@ def main():
                           plot_type='bar',
                           plot_size=(5, 15))
         st.write("The GDPR (Article 22) provides restrictive rules"
-                 " to prevent man from being subjected to decisions"
+                 " to prevent human from being subjected to decisions"
                  " emanating only from machines.")
         st.write("SHAP meets the requirements of the GDPR and allows us"
                  " to determine the effects of the features"
