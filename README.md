@@ -19,4 +19,5 @@ La source des données est la suivante : https://www.kaggle.com/c/home-credit-de
 
 ## L'outil de scoring crédit (Tableau de bord ou Dashboard) :
 - Réalisation de l'API Flask de prédiction du score déployée dans le cloud (Heroku) ;
-- Réalisation d'un dashboard interactif (Streamlit) déployé dans le cloud (Streamlit share).
+- Réalisation d'un dashboard interactif (Streamlit) déployé dans le cloud (Streamlit share) ;
+- Lien du dashboard : https://share.streamlit.io/yakoyma/p7-implementation-model-scoring-credit/main/dashboard.py
