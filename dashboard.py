@@ -230,7 +230,7 @@ def main():
          "Similar customers",
          "Global interpretability of the model",
          "Local interpretability of the model",
-         "customer's data"])
+         "Customer's data"])
 
     # Selection of features for the descriptive information
     features = ['CNT_CHILDREN', 'DAYS_BIRTH', 'DAYS_EMPLOYED',
