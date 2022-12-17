@@ -43,7 +43,7 @@ def preprocessing(data, num_imputer, bin_imputer, transformer, scaler):
     # Categorical features
     cat_features = list(data.select_dtypes('object').nunique().index)
 
-    # Encoding categorical features
+    # Encoding the categorical features
     df = pd.get_dummies(X_df, columns=cat_features)
 
     # Numerical and binary features
@@ -72,20 +72,22 @@ def preprocessing(data, num_imputer, bin_imputer, transformer, scaler):
 
 
 def request_prediction(model_uri, data):
-    """This function requests the API by sending customer data
-    and receiving API responses with predictions (score, application status).
+    """This function requests the API by sending the data of the customer
+     to the API and receives the response of the API with the results of
+     the predictions (the score of the customer and
+     the status of his application).
     """
     headers = {"Content-Type": "application/json"}
     data_json = data.to_dict(orient="records")[0]
 
-    # Dashboard request
+    # Request of the dashboard
     response = requests.request(method='GET', headers=headers,
                                 url=model_uri, json=data_json)
     if response.status_code != 200:
         raise Exception("Request failed with status {}, {}".format(
                 response.status_code, response.text))
 
-    # API response
+    # Response of the API
     api_response = response.json()
     score = api_response['score']
     situation = api_response['class']
@@ -102,7 +104,7 @@ def load_model(file, key):
 
 
 def apply_knn(X, X_norm, data, features):
-    """This function uses the near neighbor's algorithm
+    """This function uses the near neighbors' algorithm
     to find the most similar group of a customer.
     """
     X_norm = X_norm[features]
@@ -120,7 +122,8 @@ def apply_knn(X, X_norm, data, features):
 
 
 def customer_description(data):
-    """This function creates a dataframe with the customer's descriptions."""
+    """This function creates a dataframe with
+     the description of the customer."""
     df = pd.DataFrame(
         columns=['Gender', 'Age (years)', 'Family status',
                  'Number of children', 'Days employed',
@@ -169,20 +172,20 @@ def main():
                             scaler)
     X_norm = norm_df.drop(['SK_ID_CURR'], axis=1)
 
-    # Customer selection
+    # Selection of the customer
     customers_list = list(data.SK_ID_CURR)
     customer_id = st.sidebar.selectbox(
         "Select or enter a customer ID:", customers_list)
 
-    # Customer data
+    # Retrieving the customer's data
     customer_df = data[data.SK_ID_CURR == customer_id]
     viz_df = customer_df.round(2)
 
-    # Preprocessed customer data for prediction
+    # Preprocessing the data of the customer for the prediction
     X = norm_df[norm_df.SK_ID_CURR == customer_id]
     X = X.drop(['SK_ID_CURR'], axis=1)
 
-    # Dashboard request
+    # Request of the dashboard
     # Local API URI
     # API_URI = 'http://127.0.0.1:5000/predict'
     # Heroku API URI
@@ -196,7 +199,7 @@ def main():
              " the credit application status is {}.".format(customer_id, score,
                                                             situation, status))
 
-    # Feature importance
+    # Feature Importance
     model.predict(np.array(X_norm))
     features_importance = model.feature_importances_
     sorted = np.argsort(features_importance)
@@ -218,12 +221,12 @@ def main():
     shap_df.reset_index(inplace=True, drop=True)
     shap_features = list(shap_df.iloc[0:20, ].feature)
 
-    # Customer description
+    # Description of the customer
     st.header("Descriptive information of the customer")
     info_viz = customer_description(customer_df)
     st.dataframe(info_viz.set_index('Customer ID'))
 
-    # Customer information
+    # Information of the customer
     info_display = st.sidebar.selectbox(
         "Select the topic to display:",
         ["Visualisations",
@@ -232,14 +235,14 @@ def main():
          "Local interpretability of the model",
          "Customer's data"])
 
-    # Selection of features for the descriptive information
+    # Selecting the features for the descriptive information
     features = ['CNT_CHILDREN', 'DAYS_BIRTH', 'DAYS_EMPLOYED',
                 'AMT_INCOME_TOTAL', 'AMT_CREDIT', 'AMT_ANNUITY']
     for feature in shap_features:
         if feature not in features:
             features.append(feature)
 
-    # Applying Nearest Neighbors
+    # Applying the Nearest Neighbors function
     with st.spinner("Loading..."):
         knn_df = apply_knn(X, X_norm, data, features)
     group_df = knn_df[knn_df.SK_ID_CURR != customer_id]
@@ -349,16 +352,16 @@ def main():
                  " (see local model interpretability).")
         st.dataframe(group_viz.set_index('Customer ID'))
 
-        # Similar customer selection
+        # Selection of the similar customer
         clients_list = list(group_df.SK_ID_CURR)
         client_id = st.sidebar.selectbox(
             "Select or enter a similar customer ID:", clients_list)
 
-        # Preprocessed data of the similar customers for prediction
+        # Preprocessing the data of the similar customers for the prediction
         X_df = norm_df[norm_df.SK_ID_CURR == client_id]
         X_df = X_df.drop(['SK_ID_CURR'], axis=1)
 
-        # Dashboard request
+        # Request of the dashboard
         # Local API URI
         # API_URI = 'http://127.0.0.1:5000/predict'
         # Heroku API URI
@@ -406,7 +409,7 @@ def main():
         viz_df = viz_df.transpose()
         st.dataframe(viz_df)
 
-        # Loading the dataset description
+        # Loading the description of the dataset
         st.subheader("Description of the data")
         st.write("Displaying the description of the customer's data.")
         data_description = load_data('data/data_columns_description.csv')
