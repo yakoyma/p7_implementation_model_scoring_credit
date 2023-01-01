@@ -1,4 +1,4 @@
-# Projet 7 : Implémentez un modèle de scoring
+# Project 7: Implement a scoring model
 import os
 import numpy as np
 import json
@@ -12,7 +12,7 @@ app.config["DEBUG"] = True
 
 def load_model():
     """
-    This function loads a serialized machine learning file.
+    This function loads a serialised machine learning file.
     """
 
     folder = os.path.dirname(os.path.abspath(__file__))
@@ -25,9 +25,9 @@ def load_model():
 
 @app.route('/predict', methods=['GET', 'POST'])
 def predict():
-    """
-    This function is used for making prediction.
-    """
+    """This function is used for making prediction.
+    and returns the score, the situation,
+    and the status of the customer's application"""
 
     # Input data from dashboard request
     request_json = request.get_json()
@@ -42,26 +42,26 @@ def predict():
     # Making prediction
     y_proba = model.predict_proba([data])[0][0]
 
-    # Looking for the customer situation (class 0 or 1)
+    # Finding the situation of the customer (class 0 or 1)
     # by using the best threshold from precision-recall curve
     y_class = round(y_proba, 2)
     best_threshold = 0.36
     customer_class = np.where(y_class > best_threshold, 1, 0)
 
-    # Customer score calculation
+    # Calculation of the customer's score
     score = int(y_class * 100)
 
-    # Customer credit application result
+    # Result of the credit application
     if customer_class == 1:
-        result = 'at risk'
-        status = 'refused'
+        situation = 'à risque'
+        status = 'refusée'
     else:
-        result = 'without risk'
-        status = 'granted'
+        situation = 'sans risque'
+        status = 'acceptée'
 
     # API response to the dashboard
     response = json.dumps(
-        {'score': score, 'class': result, 'application': status})
+        {'score': score, 'class': situation, 'application': status})
     return response, 200
 
 
