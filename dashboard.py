@@ -349,7 +349,7 @@ def main():
                  " with 10 similar customers.".format(customer_id))
         st.write("This grouping is based on the descriptive information"
                  " and the important data for the prediction of score"
-                 " (see local model interpretability).")
+                 " (see the local interpretability of the model).")
         st.dataframe(group_viz.set_index('Customer ID'))
 
         # Selection of the similar customer
