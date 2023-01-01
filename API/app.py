@@ -53,11 +53,11 @@ def predict():
 
     # Result of the credit application
     if customer_class == 1:
-        situation = 'à risque'
-        status = 'refusée'
+        situation = 'at risk'
+        status = 'refused'
     else:
-        situation = 'sans risque'
-        status = 'acceptée'
+        situation = 'without risk'
+        status = 'granted'
 
     # API response to the dashboard
     response = json.dumps(
