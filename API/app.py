@@ -29,7 +29,7 @@ def predict():
     and returns the score, the situation,
     and the status of the customer's application"""
 
-    # Input data from dashboard request
+    # Input data from the request of the dashboard
     request_json = request.get_json()
     print(request_json)
     data = []
