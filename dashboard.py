@@ -193,7 +193,9 @@ def main():
     score, situation, status = request_prediction(API_URI, X)
     st.header("Status of the credit application")
     st.write("The credit score varies between 0 and 100. "
-             "Customers with scores above 36 are at risk.")
+             "According to the model evaluation, the best value of "
+             "the threshold is 36. This is the default value. That is why, "
+             "customers with scores above 36 are at risk.")
     st.write("**The score of the customer N°{} is {}.** "
              "The customer's situation is {}. So,"
              " the credit application status is {}.".format(customer_id, score,
