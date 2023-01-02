@@ -21,4 +21,4 @@ La source des données est la suivante : https://www.kaggle.com/c/home-credit-de
 - Réalisation de l'API Flask de prédiction du score déployée dans le cloud (Heroku) ;
 - Réalisation d'un dashboard interactif (Streamlit) déployé dans le cloud (Streamlit share) ;
 - En raison du coût de l'hébergement de l'API, seule la version du dashboard entièrement implémentée avec streamlit, déployée gratuitement dans Streamlit share, est affichée ;
-- Lien du dashboard : https://share.streamlit.io/yakoyma/p7-implementation-model-scoring-credit/main/full_streamlit_dashboard.py
+- Lien du dashboard : https://yakoyma-p7-implementation-model-full-streamlit-dashboard-ssodxe.streamlit.app
