@@ -14,7 +14,6 @@ def load_model():
     """
     This function loads a serialised machine learning file.
     """
-
     folder = os.path.dirname(os.path.abspath(__file__))
     file_path = os.path.join(folder, 'model/model.pkl')
     with open(file_path, 'rb') as f:
@@ -28,7 +27,6 @@ def predict():
     """This function is used for making prediction.
     and returns the score, the situation,
     and the status of the customer's application"""
-
     # Input data from the request of the dashboard
     request_json = request.get_json()
     print(request_json)
