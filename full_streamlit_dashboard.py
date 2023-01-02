@@ -208,12 +208,15 @@ def main():
     st.header("Status of the credit application")
     st.write("The credit score varies between 0 and 100. "
              "According to the model evaluation, the best value of "
-             "the threshold is {}. This is the default value. That is why, "
-             "customers with scores above 36 are at risk.".format(threshold))
+             "the threshold is {} in order to minimise the number of credits "
+             "granted by error to customers with high risk of default. "
+             "This is the default value. The value of the current threshold "
+             "is {}. Customers with scores above {} are at risk.".format(
+        best_threshold, threshold, threshold))
     st.write("**The score of the customer N°{} is {}.** "
-             "The customer's situation is {}. So,"
-             " the credit application status is {}.".format(customer_id, score,
-                                                            situation, status))
+             "The customer's situation is {}. Therefore, the status of "
+             "the credit application is {}.".format(
+        customer_id, score, situation, status))
 
     # Feature Importance
     model.predict(np.array(X_norm))
