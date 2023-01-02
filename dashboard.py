@@ -21,9 +21,7 @@ import shap
 import plotly_express as px
 
 
-from pathlib import Path
 from sklearn.neighbors import NearestNeighbors
-
 plt.style.use('seaborn')
 
 
@@ -71,6 +69,14 @@ def preprocessing(data, num_imputer, bin_imputer, transformer, scaler):
     return norm_df
 
 
+def load_model(file, key):
+    """This function is used to load a serialised file."""
+    path = open(file, 'rb')
+    model_pickle = pickle.load(path)
+    model = model_pickle[key]
+    return model
+
+
 def request_prediction(model_uri, data):
     """This function requests the API by sending the data of the customer
      to the API and receives the response of the API with the results of
@@ -95,32 +101,6 @@ def request_prediction(model_uri, data):
     return score, situation, status
 
 
-def load_model(file, key):
-    """This function is used to load a serialised file."""
-    path = open(file, 'rb')
-    model_pickle = pickle.load(path)
-    model = model_pickle[key]
-    return model
-
-
-def apply_knn(X, X_norm, data, features):
-    """This function uses the near neighbors' algorithm
-    to find the most similar group of a customer.
-    """
-    X_norm = X_norm[features]
-    X = X[features]
-    neigh = NearestNeighbors(
-        n_neighbors=11,
-        leaf_size=30,
-        metric='minkowski',
-        p=2)
-    neigh.fit(X_norm)
-    indice = neigh.kneighbors(X, return_distance=False)
-    index_list = list(indice[0])
-    knn_df = data.iloc[index_list, :]
-    return knn_df
-
-
 def customer_description(data):
     """This function creates a dataframe with
      the description of the customer."""
@@ -140,6 +120,24 @@ def customer_description(data):
     df['Loan annuity ($)'] = list(data.AMT_ANNUITY.astype('int64'))
     df['Organization type'] = list(data.ORGANIZATION_TYPE)
     return df
+
+
+def apply_knn(X, X_norm, data, features):
+    """This function uses the near neighbors' algorithm
+    to find the most similar group of a customer.
+    """
+    X_norm = X_norm[features]
+    X = X[features]
+    neigh = NearestNeighbors(
+        n_neighbors=11,
+        leaf_size=30,
+        metric='minkowski',
+        p=2)
+    neigh.fit(X_norm)
+    indice = neigh.kneighbors(X, return_distance=False)
+    index_list = list(indice[0])
+    knn_df = data.iloc[index_list, :]
+    return knn_df
 
 
 def main():
@@ -334,8 +332,7 @@ def main():
             viz_data = infos_viz.groupby('Family status').count()
             viz_data.reset_index(inplace=True, drop=False)
             viz_data = viz_data.rename(columns={"Customer ID": "Count"})
-            fig7 = px.bar(
-                viz_data, x='Family status', y='Count', height=400)
+            fig7 = px.bar(viz_data, x='Family status', y='Count', height=400)
             st.write(fig7)
         elif display_description == "Business segment":
             st.subheader("Business segment")
