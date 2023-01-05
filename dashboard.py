@@ -144,6 +144,7 @@ def main():
     st.set_page_config(layout='wide')
     st.title("CREDIT SCORING DASHBOARD")
 
+
     # Loading the dataset
     data = load_data('data/data.csv')
 
@@ -162,6 +163,7 @@ def main():
     # Loading the numerical scaler
     scaler = load_model('model/scaler.pkl', 'scaler')
 
+
     # Preprocessing
     norm_df = preprocessing(data,
                             num_imputer,
@@ -170,18 +172,22 @@ def main():
                             scaler)
     X_norm = norm_df.drop(['SK_ID_CURR'], axis=1)
 
+
     # Selection of the customer
     customers_list = list(data.SK_ID_CURR)
     customer_id = st.sidebar.selectbox(
         "Select or enter a customer ID:", customers_list)
 
+
     # Retrieving the customer's data
     customer_df = data[data.SK_ID_CURR == customer_id]
     viz_df = customer_df.round(2)
 
+
     # Preprocessing the data of the customer for the prediction
     X = norm_df[norm_df.SK_ID_CURR == customer_id]
     X = X.drop(['SK_ID_CURR'], axis=1)
+
 
     # Request of the dashboard
     # Local API URI
@@ -199,6 +205,7 @@ def main():
              " the credit application status is {}.".format(customer_id, score,
                                                             situation, status))
 
+
     # Feature Importance
     model.predict(np.array(X_norm))
     features_importance = model.feature_importances_
@@ -210,6 +217,7 @@ def main():
     dataviz.reset_index(inplace=True, drop=True)
     dataviz = dataviz.sort_values(['importance'], ascending=False)
 
+
     # SHAP explanations
     shap.initjs()
     shap_explainer = shap.TreeExplainer(model)
@@ -219,12 +227,13 @@ def main():
         columns=['feature', 'importance'])
     shap_df = shap_df.sort_values(by=['importance'], ascending=False)
     shap_df.reset_index(inplace=True, drop=True)
-    shap_features = list(shap_df.iloc[0:20, ].feature)
+
 
     # Description of the customer
     st.header("Descriptive information of the customer")
     info_viz = customer_description(customer_df)
     st.dataframe(info_viz.set_index('Customer ID'))
+
 
     # Information of the customer
     info_display = st.sidebar.selectbox(
@@ -236,8 +245,10 @@ def main():
          "Customer's data"])
 
     # Selecting the features for the descriptive information
+    # and the grouping
     features = ['CNT_CHILDREN', 'DAYS_BIRTH', 'DAYS_EMPLOYED',
                 'AMT_INCOME_TOTAL', 'AMT_CREDIT', 'AMT_ANNUITY']
+    shap_features = list(shap_df.iloc[0:20, ].feature)
     for feature in shap_features:
         if feature not in features:
             features.append(feature)
