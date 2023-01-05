@@ -128,14 +128,14 @@ def customer_description(data):
     return df
 
 
-def apply_knn(X, X_norm, data, features):
+def apply_knn(X, X_norm, data, features, n_neighbors):
     """This function uses the near neighbors' algorithm
     to find the most similar group of a customer.
     """
     X_norm = X_norm[features]
     X = X[features]
     neigh = NearestNeighbors(
-        n_neighbors=11,
+        n_neighbors=n_neighbors + 1,
         leaf_size=30,
         metric='minkowski',
         p=2)
@@ -149,6 +149,7 @@ def apply_knn(X, X_norm, data, features):
 def main():
     st.set_page_config(layout='wide')
     st.title("CREDIT SCORING DASHBOARD")
+
 
     # Loading the dataset
     data = load_data('data/data.csv')
@@ -168,6 +169,7 @@ def main():
     # Loading the numerical scaler
     scaler = load_model('model/scaler.pkl', 'scaler')
 
+
     # Preprocessing
     norm_df = preprocessing(data,
                             num_imputer,
@@ -176,47 +178,45 @@ def main():
                             scaler)
     X_norm = norm_df.drop(['SK_ID_CURR'], axis=1)
 
+
     # Selection of the customer
     customers_list = list(data.SK_ID_CURR)
     customer_id = st.sidebar.selectbox(
         "Select or enter a customer ID:", customers_list)
 
+
     # Selection of the threshold
     # The default value of the threshold is 36
-    best_threshold = 36
-
     # The threshold varies between 0 and 100
-    selected_threshold = st.sidebar.slider(
-        "Select the threshold value:", min_value=0, max_value=100)
-    if selected_threshold <= 0 or selected_threshold >= 100:
-        # The default value is applied
-        # if the selected value is not between 0 and 100
-        threshold = best_threshold
-    else:
-        threshold = selected_threshold
+    threshold = st.sidebar.slider(
+        "Select the threshold value:", min_value=0, max_value=100, value=36)
+
 
     # Retrieving the customer's data
     customer_df = data[data.SK_ID_CURR == customer_id]
     viz_df = customer_df.round(2)
 
+
     # Preprocessing the data of the customer for the prediction
     X = norm_df[norm_df.SK_ID_CURR == customer_id]
     X = X.drop(['SK_ID_CURR'], axis=1)
+
 
     # Results of the prediction
     score, situation, status = predictor(X, model, threshold)
     st.header("Status of the credit application")
     st.write("The credit score varies between 0 and 100. "
              "According to the model evaluation, the best value of "
-             "the threshold is {} in order to minimise the number of credits "
+             "the threshold is 36 in order to minimise the number of credits "
              "granted by error to customers with high risk of default. "
              "This is the default value. The value of the current threshold "
              "is {}. Customers with scores above {} are at risk.".format(
-        best_threshold, threshold, threshold))
+        threshold, threshold))
     st.write("**The score of the customer N°{} is {}.** "
              "The customer's situation is {}. Therefore, the status of "
              "the credit application is {}.".format(
         customer_id, score, situation, status))
+
 
     # Feature Importance
     model.predict(np.array(X_norm))
@@ -229,6 +229,7 @@ def main():
     dataviz.reset_index(inplace=True, drop=True)
     dataviz = dataviz.sort_values(['importance'], ascending=False)
 
+
     # SHAP explanations
     shap.initjs()
     shap_explainer = shap.TreeExplainer(model)
@@ -238,12 +239,13 @@ def main():
         columns=['feature', 'importance'])
     shap_df = shap_df.sort_values(by=['importance'], ascending=False)
     shap_df.reset_index(inplace=True, drop=True)
-    shap_features = list(shap_df.iloc[0:20, ].feature)
+
 
     # Description of the customer
     st.header("Descriptive information of the customer")
     info_viz = customer_description(customer_df)
     st.dataframe(info_viz.set_index('Customer ID'))
+
 
     # Information of the customer
     info_display = st.sidebar.selectbox(
@@ -255,24 +257,33 @@ def main():
          "Customer's data"])
 
     # Selecting the features for the descriptive information
+    # and the grouping
     features = ['CNT_CHILDREN', 'DAYS_BIRTH', 'DAYS_EMPLOYED',
                 'AMT_INCOME_TOTAL', 'AMT_CREDIT', 'AMT_ANNUITY']
+    shap_features = list(shap_df.iloc[0:20, ].feature)
     for feature in shap_features:
         if feature not in features:
             features.append(feature)
 
     # Applying the Nearest Neighbors function
+    # Selection of the number of similar customers
+    n_neighbors = st.sidebar.slider(
+        "Select the number of similar customers:",
+        min_value=0, max_value=50, value=10)
     with st.spinner("Loading..."):
-        knn_df = apply_knn(X, X_norm, data, features)
+        knn_df = apply_knn(X, X_norm, data, features, n_neighbors)
     group_df = knn_df[knn_df.SK_ID_CURR != customer_id]
     group_viz = customer_description(group_df)
     infos_viz = info_viz.append(group_viz)
 
     if info_display == "Visualisations":
         st.header("Visualisations of the descriptive information")
-        st.write("Visualisations are used to compare"
-                 " the descriptive information of the customer N°{}"
-                 " with 10 similar clients.".format(customer_id))
+        st.write("Visualisations are used to compare the descriptive "
+                 "information of the customer N°{} with similar "
+                 "clients.".format(customer_id))
+        st.write("The default number of similar customers is 10. "
+                 "The current number of similar customers is {}.".format(
+            n_neighbors))
         display_description = st.sidebar.selectbox(
             "Select the descriptive information:",
             ["Financial information", "Gender", "Age",
@@ -364,7 +375,8 @@ def main():
     elif info_display == "Similar customers":
         st.header("Similar customers")
         st.write("Grouping allows us to compare the customer N°{}"
-                 " with 10 similar customers.".format(customer_id))
+                 " with {} similar customers.".format(
+            customer_id, n_neighbors))
         st.write("This grouping is based on the descriptive information"
                  " and the important data for the prediction of score"
                  " (see the local interpretability of the model).")
@@ -387,6 +399,13 @@ def main():
     elif info_display == "Global interpretability of the model":
         st.header("Global interpretability of the model")
         fig9 = plt.figure(figsize=(10, 20))
+
+        # Selection of the number of features to display
+        max_display = st.sidebar.slider(
+            "Select the number of features to display for "
+            "the global interpretability of the model:", min_value=0,
+            max_value=dataviz.shape[0], value=dataviz.shape[0])
+        dataviz = dataviz.iloc[0:max_display, ]
         sns.barplot(x='importance', y='feature', data=dataviz)
         st.write("The GDPR (Article 22) provides restrictive rules"
                  " to prevent human from being subjected to decisions"
@@ -399,11 +418,17 @@ def main():
     elif info_display == "Local interpretability of the model":
         st.header("Local interpretability of the model")
         fig10 = plt.figure()
+
+        # Selection of the number of features to display
+        max_display = st.sidebar.slider(
+            "Select the number of features to display for "
+            "the local interpretability of the model:", min_value=0,
+            max_value=100, value=50)
         shap.summary_plot(shap_values, X,
                           feature_names=list(X.columns),
-                          max_display=50,
+                          max_display=max_display,
                           plot_type='bar',
-                          plot_size=(5, 15))
+                          plot_size=(7, 20))
         st.write("The GDPR (Article 22) provides restrictive rules"
                  " to prevent human from being subjected to decisions"
                  " emanating only from machines.")
